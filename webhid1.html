@@ -1,0 +1,218 @@
+<html>
+
+<h3>WebHID test 1</h3>
+
+<button id="connect">Connect</button>
+<div id="info"></div>
+
+<style>
+    div#info {
+        font-family:'Courier New', Courier, monospace;
+    }
+</style>
+
+<script>
+
+    class StadiaController {
+        
+        STADIA_VID = 0x18D1
+        STADIA_PID = 0x9400
+
+        STATUS_LEN = 10
+        status = [0,0,0,0,0,0,0,0,0,0]
+
+        // controls
+        DPD = 0
+        MENU = 1
+        ABXY = 2
+        LANAX = 3
+        LANAY = 4
+        RANAX = 5
+        RANAY = 6
+        LTRIG = 7
+        RTRIG = 8
+        EXTRA = 9
+
+        // Flags
+        DUP = 1
+        DDOWN = 1
+        DLEFT = 1
+        DRIGHT = 1
+
+        ABUT = 0x40
+        BBUT = 0x20
+        XBUT = 0x10
+        YBUT = 0x08
+        LBUT = 0x04
+        RBUT = 0x02
+        LANABUT = 0x01
+
+        constructor() {
+            this.connected = false
+        }
+
+        connect (changedCallback) {
+            if (navigator.hid) {
+                const [device] = navigator.hid.requestDevice({ filters: [
+                    {vendorId: this.STADIA_VID, productId: this.STADIA_PID}
+                ] }).then( (devices) => {
+                    device = devices[0]
+                    if (device !== undefined) {
+                        device.open().then(() => {
+                            this.device = device
+                            this.connected = connected
+                            device.oninputreport = this.inputReport
+                            this.changedCallback = changedCallback
+                            navigator.hid.addEventListener('disconnect', this.disconnected)
+                        })
+                    }
+                })
+            }
+            return this.connected
+        }
+
+        disconnected (event) {
+            if (event.device.productId == STADIA_PID) {
+                console.log("Disconnected")
+                this.connected = false
+                this.device = undefined
+            }
+        }
+
+        inputReport (event) {
+            const { data, device, reportId } = event;
+
+            for(let i=0; i < this.STATUS_LEN; i++) {
+                this.status[i] = data.getUint8(i)
+            }
+
+            console.log('IR',device.productId, device.productName, reportId)
+
+            if (this.changedCallback) {
+                this.changedCallback()
+            }
+
+        }
+
+        get leftAnalog() {
+            return [ this.status[this.LANAX], this.status[this.LANAY] ]
+        }
+
+        get rightAnalog() {
+            return [ this.status[this.RANAX], this.status[this.RANAY] ]
+        }
+
+        get leftTrigger() {
+            return [ this.status[this.LTRIG] ]
+        }
+
+        get rightTrigger() {
+            return [ this.status[this.RTRIG]]
+        }
+
+        toBinary (num, size=8) {
+            var s = "000000000" + num.toString(2);
+            return s.substr(s.length-size);
+        }
+
+        statusTable () {
+            var out = `
+                <table>
+                    <tr>
+                        <td>DPad</td><td>Menu</td><td>&nbsp;ABXYLR</td><td>LAX</td><td>LAY</td><td>RAX</td><td>RAY</td><td>LT</td><td>RT</td>
+                    </tr>
+                    <tr>`
+            out += '<td>' + this.toBinary(this.status[0]) + '</td>'
+            out += '<td>' + this.toBinary(this.status[1]) + '</td>'
+            out += '<td>' + this.toBinary(this.status[2]) + '</td>'
+
+            out += '<td>' + this.status[3].toString() + '</td>'
+            out += '<td>' + this.status[4].toString() + '</td>'
+            out += '<td>' + this.status[5].toString() + '</td>'
+            out += '<td>' + this.status[6].toString() + '</td>'
+            out += '<td>' + this.status[7].toString() + '</td>'
+            out += '<td>' + this.status[8].toString() + '</td>'
+
+            out += '<td>' + this.toBinary(this.status(9)) + '</td> '
+            out += '</tr></table>'
+
+            return out
+        }
+
+    }
+
+    var stadia = undefined
+
+    const STADIA_VID = 0x18D1
+    const STADIA_PID = 0x9400
+
+    const connect = document.getElementById('connect')
+    const info = document.getElementById('info')
+
+    const toBinary = (num, size=8) =>  {
+        var s = "000000000" + num.toString(2);
+        return s.substr(s.length-size);
+    }
+
+    const connectController = async () => {
+
+        stadia = new StadiaController()
+        if (stadia.connect() === true) {
+            console.log("Connected")
+        }
+
+
+        let devices = await navigator.hid.getDevices()
+        devices.forEach((device) => {
+            console.log(`HID: ${device.productName}`)
+        })
+
+        const [device] = await navigator.hid.requestDevice({ filters: [] })
+
+
+        console.log(device)
+        await device.open()
+
+        device.oninputreport = (event) => {
+
+            const { data, device, reportId } = event;
+
+            console.log(device.productId, device.productName, reportId)
+
+            var out = `
+                <table>
+                    <tr>
+                        <td>DPad</td><td>Menu</td><td>&nbsp;ABXYLR</td><td>LAX</td><td>LAY</td><td>RAX</td><td>RAY</td><td>LT</td><td>RT</td>
+                    </tr>
+                    <tr>`
+            out += '<td>' + toBinary(data.getUint8(0)) + '</td>'
+            out += '<td>' + toBinary(data.getUint8(1)) + '</td>'
+            out += '<td>' + toBinary(data.getUint8(2)) + '</td>'
+
+            out += '<td>' + data.getUint8(3).toString() + '</td>'
+            out += '<td>' + data.getUint8(4).toString() + '</td>'
+            out += '<td>' + data.getUint8(5).toString() + '</td>'
+            out += '<td>' + data.getUint8(6).toString() + '</td>'
+            out += '<td>' + data.getUint8(7).toString() + '</td>'
+            out += '<td>' + data.getUint8(8).toString() + '</td>'
+
+            out += '<td>' + toBinary(data.getUint8(9)) + '</td> '
+
+            info.innerHTML = out
+
+        }
+
+    }
+
+
+    navigator.hid.addEventListener('disconnect', (event) => {
+        console.log(`HID disconnected: ${event.device.productName}`)
+        console.dir(event)
+    })
+
+    connect.addEventListener('click', connectController)
+
+</script>
+
+
+</html>
