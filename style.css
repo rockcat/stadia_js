@@ -1,0 +1,16 @@
+body {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 20px;
+    background-color: whitesmoke;
+}
+
+div#scene {
+    width: 800px;
+    height: 600px;
+    border: solid 2px grey;
+}
+
+div#info {
+    font-family:'Courier New', Courier, monospace;
+}
+

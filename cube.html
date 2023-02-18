@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Spinny Cube</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h3>Stadia + Three.js</h3>
+    <p>
+        Use the left and right triggers to spin the cube and the A button to change colour.
+    </p>
+
+    <div>
+        <button id="connect">Connect Controller</button>
+    </div>
+    <p></p>
+    <div id="scene"></div>
+    <div id="info"></div>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.149.0/build/three.module.js"
+                }
+        }
+    </script>
+
+    <script type="module">
+        import { start } from './cube.js'
+
+        start()
+
+    </script>
+</body>
+
+</html>

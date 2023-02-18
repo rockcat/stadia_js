@@ -1,0 +1,36 @@
+<html>
+
+<h3>WebHID Basic</h3>
+<p>Connect a Stadia controller - can be over Bluetooth or direct via USB</p>
+<p>Then press the Connect button - Browser secuity requires teh connection be human initiaited</p>
+
+<button id="connect">Connect</button>
+<p></p>
+<pre id="info"></pre>
+
+
+<script type='module'>
+
+    import StadiaController from './stadia.js'
+
+    const controlsChanged = (status) => {
+        document.getElementById('info')
+                .innerHTML = JSON.stringify(status, undefined, 2)
+    }
+
+    const connectController = async () => {
+
+        const stadia = new StadiaController()
+        stadia.connect(controlsChanged)
+        .then(() => {
+            console.log(stadia.connected ? "Connected" : "No controller")
+        })
+    }
+
+    document.getElementById('connect')
+            .addEventListener('click', connectController)
+
+</script>
+
+
+</html>

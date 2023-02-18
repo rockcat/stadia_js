@@ -1,0 +1,23 @@
+{
+  "name": "stadia_js",
+  "version": "1.0.0",
+  "description": "Using a Stadia Controller from a browser",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rockcat/stadia_js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rockcat/stadia_js/issues"
+  },
+  "homepage": "https://github.com/rockcat/stadia_js#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
