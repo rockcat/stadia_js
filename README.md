@@ -51,5 +51,7 @@ Then navigate to http://localhost:3002/basic.html or http://localhost:3002/cube.
 
 This example creates a cube using three.js which can be rotates it with the two analogue triggers on the Stadia contoller. The A button will change the colour of the cube.
 
+Short video is here: https://youtu.be/zrzJPpVoYNw
+
 -- rockcat Feb 2023
 
